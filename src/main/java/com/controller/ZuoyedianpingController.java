@@ -1,39 +1,35 @@
 package com.controller;
 
+import java.io.IOException;
+
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
-import com.utils.ValidatorUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.entity.pojo.JudgeRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+
+
+import org.springframework.http.ResponseEntity;
+
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.annotation.IgnoreAuth;
+
 
 import com.entity.ZuoyedianpingEntity;
 import com.entity.view.ZuoyedianpingView;
 
 import com.service.ZuoyedianpingService;
-import com.service.TokenService;
 import com.utils.PageUtils;
 import com.utils.R;
-import com.utils.MD5Util;
 import com.utils.MPUtil;
-import com.utils.CommonUtil;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -48,15 +44,15 @@ import com.utils.CommonUtil;
 public class ZuoyedianpingController {
     @Autowired
     private ZuoyedianpingService zuoyedianpingService;
-    
+
 
 
     /**
      * 后端列表
      */
     @RequestMapping("/page")
-    public R page(@RequestParam Map<String, Object> params,ZuoyedianpingEntity zuoyedianping,
-		HttpServletRequest request){
+    public R page(@RequestParam Map<String, Object> params, ZuoyedianpingEntity zuoyedianping,
+				  HttpServletRequest request){
 		String tableName = request.getSession().getAttribute("tableName").toString();
 		if(tableName.equals("xuesheng")) {
 			zuoyedianping.setXuehao((String)request.getSession().getAttribute("username"));
@@ -74,7 +70,7 @@ public class ZuoyedianpingController {
      * 前端列表
      */
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params,ZuoyedianpingEntity zuoyedianping, 
+    public R list(@RequestParam Map<String, Object> params,ZuoyedianpingEntity zuoyedianping,
 		HttpServletRequest request){
         EntityWrapper<ZuoyedianpingEntity> ew = new EntityWrapper<ZuoyedianpingEntity>();
 		PageUtils page = zuoyedianpingService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, zuoyedianping), params), params));
@@ -214,7 +210,53 @@ public class ZuoyedianpingController {
 		int count = zuoyedianpingService.selectCount(wrapper);
 		return R.ok().put("count", count);
 	}
-	
+
+
+	private static final String JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true&fields=*";
+	private static final String RAPIDAPI_KEY = "xx"; // 替换为你的 RapidAPI 密钥
+	private static final String RAPIDAPI_HOST = "judge0-ce.p.rapidapi.com";
+
+	@Autowired
+	private ObjectMapper objectMapper;
+
+
+	@PostMapping("/run-code")
+	public ResponseEntity<String> judgeCode(@RequestParam String code) throws IOException {
+		// 构造请求体
+		JudgeRequest requestBody = new JudgeRequest();
+		requestBody.setLanguage_id(71); // 设置语言为python
+		requestBody.setSource_code(code); // 设置源代码
+		requestBody.setStdin(""); // 设置标准输入（如果需要的话）
+
+		// 使用 OkHttp 发送 POST 请求
+		OkHttpClient client = new OkHttpClient();
+		MediaType mediaType = MediaType.parse("application/json"); // 设置请求体的媒体类型为 JSON
+		okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType, objectMapper.writeValueAsString(requestBody)); // 将请求体转换为 JSON 字符串
+		Request request = new Request.Builder() //构建请求
+				.url(JUDGE0_URL)
+				.post(body)
+				.addHeader("x-rapidapi-key", RAPIDAPI_KEY)
+				.addHeader("x-rapidapi-host", RAPIDAPI_HOST)
+				.addHeader("Content-Type", "application/json")
+				.build();
+
+		// 发送请求并获取响应
+		try (Response response = client.newCall(request).execute()) {
+			// 检查响应是否成功
+			if (!response.isSuccessful()) {
+				// 如果响应不成功，返回错误信息
+				return ResponseEntity.status(response.code()).body(response.body() != null ? response.body().string() : "error");
+			}
+			// 返回响应体内容
+			return ResponseEntity.ok(response.body() != null ? response.body().string() : "");
+		}
+	}
+
+	//转义 JSON 字符串中的特殊字符
+	private String escapeJson(String input) {
+		return input.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n");
+	}
+
 
 
 }
