@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
-import com.entity.pojo.JudgeRequest;
+import com.entity.pojo.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -219,6 +219,12 @@ public class ZuoyedianpingController {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	private static final OkHttpClient client;
+
+	static {
+		client = new OkHttpClient();
+	}
+
 
 	@PostMapping("/run-code")
 	public ResponseEntity<String> judgeCode(@RequestParam String code) throws IOException {
@@ -229,7 +235,6 @@ public class ZuoyedianpingController {
 		requestBody.setStdin(""); // 设置标准输入（如果需要的话）
 
 		// 使用 OkHttp 发送 POST 请求
-		OkHttpClient client = new OkHttpClient();
 		MediaType mediaType = MediaType.parse("application/json"); // 设置请求体的媒体类型为 JSON
 		okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType, objectMapper.writeValueAsString(requestBody)); // 将请求体转换为 JSON 字符串
 		Request request = new Request.Builder() //构建请求
@@ -257,6 +262,34 @@ public class ZuoyedianpingController {
 		return input.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n");
 	}
 
+	private static final String API_URL = "https://api.siliconflow.cn/v1/chat/completions";
+	private static final String API_TOKEN = "sk-ertqufmwrljhhslttijvsyzmbwslvhywzrriaeymcyhgxgov";
 
+	@PostMapping("/ai-score")
+	public ChatVO getAiScore(@RequestBody ChatDTO dto) throws IOException {
+		String content = "我需要你帮我给主观题打分,我发给你的数据格式为"+ChatDTO.getFormat()
+				+"你需要根据题目和学生给出的答案,客观的给出得分,比如现在这个score为10,你需要给出0-10的分值" +
+				",可以有0.5分,你输出的结果需要符合"+ ChatVO.getFormat()+"判题不要过于严格;现在开始;;;"
+				+objectMapper.writeValueAsString(dto);
+		Model model = new Model();
+		model.setMessages(Collections.singletonList(new Model.Messages(content)));
+		String jsonBody = objectMapper.writeValueAsString(model);
+		okhttp3.RequestBody body = okhttp3.RequestBody.create(jsonBody, MediaType.parse("application/json"));
+		Request httpRequest = new Request.Builder()
+				.url(API_URL)
+				.post(body)
+				.addHeader("Authorization", "Bearer " + API_TOKEN)
+				.addHeader("Content-Type", "application/json")
+				.build();
+		try (Response response = client.newCall(httpRequest).execute()) {
+			if (!response.isSuccessful()) {
+				throw new IOException("Unexpected code " + response);
+			}
+			String responseBody = response.body().string();
+			ModelResponse modelResponse = objectMapper.readValue(responseBody, ModelResponse.class);
+			String c = modelResponse.getChoices().get(0).getMessage().getContent();
+			return objectMapper.readValue(c, ChatVO.class);
+		}
+	}
 
 }
