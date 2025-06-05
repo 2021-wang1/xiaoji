@@ -213,7 +213,7 @@ public class ZuoyedianpingController {
 
 
 	private static final String JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true&fields=*";
-	private static final String RAPIDAPI_KEY = "xx"; // 替换为你的 RapidAPI 密钥
+	private static final String RAPIDAPI_KEY = "7bf88cfa73mshcafa5c6284bc584p14aec4jsnf3c65f675779"; // 替换为你的 RapidAPI 密钥
 	private static final String RAPIDAPI_HOST = "judge0-ce.p.rapidapi.com";
 
 	@Autowired
