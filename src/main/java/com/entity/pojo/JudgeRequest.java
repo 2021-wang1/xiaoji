@@ -5,8 +5,11 @@ import lombok.Data;
 @Data
 public class JudgeRequest {
 
-    private Integer language_id;
+    // 语言
+    private Integer language_id = 71;
+    // 源代码
     private String source_code;
-    private String stdin;
+    // 输入
+    private String stdin = "";
 
 }
