@@ -227,16 +227,11 @@ public class ZuoyedianpingController {
 
 
 	@PostMapping("/run-code")
-	public ResponseEntity<String> judgeCode(@RequestParam String code) throws IOException {
-		// 构造请求体
-		JudgeRequest requestBody = new JudgeRequest();
-		requestBody.setLanguage_id(71); // 设置语言为python
-		requestBody.setSource_code(code); // 设置源代码
-		requestBody.setStdin(""); // 设置标准输入（如果需要的话）
+	public ResponseEntity<String> judgeCode(@RequestBody JudgeRequest dto) throws IOException {
 
 		// 使用 OkHttp 发送 POST 请求
 		MediaType mediaType = MediaType.parse("application/json"); // 设置请求体的媒体类型为 JSON
-		okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType, objectMapper.writeValueAsString(requestBody)); // 将请求体转换为 JSON 字符串
+		okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType, objectMapper.writeValueAsString(dto)); // 将请求体转换为 JSON 字符串
 		Request request = new Request.Builder() //构建请求
 				.url(JUDGE0_URL)
 				.post(body)
@@ -255,11 +250,6 @@ public class ZuoyedianpingController {
 			// 返回响应体内容
 			return ResponseEntity.ok(response.body() != null ? response.body().string() : "");
 		}
-	}
-
-	//转义 JSON 字符串中的特殊字符
-	private String escapeJson(String input) {
-		return input.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n");
 	}
 
 	private static final String API_URL = "https://api.siliconflow.cn/v1/chat/completions";
