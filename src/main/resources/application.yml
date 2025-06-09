@@ -8,15 +8,10 @@ server:
 
 spring:
     datasource:
-          driverClassName: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://127.0.0.1:3306/springboot4prsj?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8
-          username: root
-          password: 123456
-
-#        driverClassName: com.mysql.cj.jdbc.Driver
-#        url: jdbc:mysql://127.0.0.1:3309/springboot4prsj?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8
-#        username: root
-#        password: root
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://amd2.refjttria.top:3306/springboot4prsj?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8
+        username: judging
+        password: dMrGLy2QNsipWnxBFKV8
 
 #        driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
 #        url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=springboot4prsj
