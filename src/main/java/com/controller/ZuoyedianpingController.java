@@ -334,7 +334,7 @@ public class ZuoyedianpingController {
 			throw new IllegalArgumentException("仅支持 .doc 或 .docx 文件。当前文件：" + file.getName());
 		}
 		String content = "我需要你帮我给学生作业打分,我发给你的数据格式为学生上传的word文档文本,你需要根据题目和学生给出的答案,客观的给出得分" +
-				",题目边上一般会有分值,每题的得分都需要符合给出的分值,可以有0.5分,你输出的结果需要符合"+ ChatVO.getFormat()+"判题不要过于严格" +
+				",题目边上一般会有分值,如果同时有多题,则每题的得分都需要符合给出的分值;最终返回的分值为所有题目得分的总和;可以有0.5分,你输出的结果需要符合"+ ChatVO.getFormat()+"判题不要过于严格" +
 				",如果学生未给出作答，则直接0分;如果有多个题目,则给出每题的评分原因;现在开始;;;"+textContent;
 		Model model = new Model();
 		model.setMessages(Collections.singletonList(new Model.Messages(content)));
