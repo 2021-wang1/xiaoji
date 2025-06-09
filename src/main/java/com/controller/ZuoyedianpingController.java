@@ -260,7 +260,7 @@ public class ZuoyedianpingController {
 		//设置提示词和问题
 		String content = "我需要你帮我给主观题打分,我发给你的数据格式为"+ChatDTO.getFormat()
 				+"你需要根据题目和学生给出的答案,客观的给出得分,比如现在这个score为10,你需要给出0-10的分值" +
-				",可以有0.5分,你输出的结果需要符合"+ ChatVO.getFormat()+"判题不要过于严格;现在开始;;;"
+				",可以有0.5分,你输出的结果需要符合"+ ChatVO.getFormat()+"判题不要过于严格,如果学生未给出作答，则直接0分;现在开始;;;"
 				+objectMapper.writeValueAsString(dto);
 		//设置模型
 		Model model = new Model();
