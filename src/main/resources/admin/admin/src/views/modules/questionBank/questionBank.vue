@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content">
+  <div class="main-content" style="position: relative;">
     <!-- 列表页 -->
     <div v-if="showFlag">
       <el-form :inline="true" :model="searchForm" class="form-content">
@@ -11,63 +11,13 @@
               contents.searchBoxPosition == '1' ? 'flex-start' : contents.searchBoxPosition == '2' ? 'center' : 'flex-end',
           }"
         >
-          <el-form-item :label="contents.inputTitle == 1 ? '作业标题' : ''">
-            <el-input
-              v-if="contents.inputIcon == 1 && contents.inputIconPosition == 1"
-              prefix-icon="el-icon-search"
-              v-model="searchForm.zuoyebiaoti"
-              placeholder="作业标题"
-              clearable
-            ></el-input>
-            <el-input
-              v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2"
-              suffix-icon="el-icon-search"
-              v-model="searchForm.zuoyebiaoti"
-              placeholder="作业标题"
-              clearable
-            ></el-input>
-            <el-input v-if="contents.inputIcon == 0" v-model="searchForm.zuoyebiaoti" placeholder="作业标题" clearable></el-input>
+          <el-form-item label="题目类型">
+            <el-select v-model="searchForm.zuoyebiaoti" placeholder="请选择题目类型" clearable>
+              <el-option v-for="item in workType" :key="item.id" :label="item.name" :value="item.id"> </el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item :label="contents.inputTitle == 1 ? '教师姓名' : ''">
-            <el-input
-              v-if="contents.inputIcon == 1 && contents.inputIconPosition == 1"
-              prefix-icon="el-icon-search"
-              v-model="searchForm.jiaoshixingming"
-              placeholder="教师姓名"
-              clearable
-            ></el-input>
-            <el-input
-              v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2"
-              suffix-icon="el-icon-search"
-              v-model="searchForm.jiaoshixingming"
-              placeholder="教师姓名"
-              clearable
-            ></el-input>
-            <el-input
-              v-if="contents.inputIcon == 0"
-              v-model="searchForm.jiaoshixingming"
-              placeholder="教师姓名"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item :label="contents.inputTitle == 1 ? '班级' : ''">
-            <el-input
-              v-if="contents.inputIcon == 1 && contents.inputIconPosition == 1"
-              prefix-icon="el-icon-search"
-              v-model="searchForm.banji"
-              placeholder="班级"
-              clearable
-            ></el-input>
-            <el-input
-              v-if="contents.inputIcon == 1 && contents.inputIconPosition == 2"
-              suffix-icon="el-icon-search"
-              v-model="searchForm.banji"
-              placeholder="班级"
-              clearable
-            ></el-input>
-            <el-input v-if="contents.inputIcon == 0" v-model="searchForm.banji" placeholder="班级" clearable></el-input>
-          </el-form-item>
-          <el-form-item>
+
+          <!-- <el-form-item>
             <el-button
               v-if="contents.searchBtnIcon == 1 && contents.searchBtnIconPosition == 1"
               icon="el-icon-search"
@@ -81,7 +31,7 @@
             <el-button v-if="contents.searchBtnIcon == 0" type="success" @click="search()">{{
               contents.searchBtnFont == 1 ? '查询' : ''
             }}</el-button>
-          </el-form-item>
+          </el-form-item> -->
         </el-row>
         <el-row
           class="ad"
@@ -91,56 +41,13 @@
           }"
         >
           <el-form-item>
+            <el-button type="success" icon="el-icon-plus" @click="showAddQuestion = true">新增</el-button>
             <el-button
-              v-if="isAuth('zuoyexinxi', '新增') && contents.btnAdAllIcon == 1 && contents.btnAdAllIconPosition == 1"
-              type="success"
-              icon="el-icon-plus"
-              @click="addOrUpdateHandler()"
-              >{{ contents.btnAdAllFont == 1 ? '新增' : '' }}</el-button
-            >
-            <el-button
-              v-if="isAuth('zuoyexinxi', '新增') && contents.btnAdAllIcon == 1 && contents.btnAdAllIconPosition == 2"
-              type="success"
-              @click="addOrUpdateHandler()"
-              >{{ contents.btnAdAllFont == 1 ? '新增' : '' }}<i class="el-icon-plus el-icon--right"
-            /></el-button>
-            <el-button
-              v-if="isAuth('zuoyexinxi', '新增') && contents.btnAdAllIcon == 0"
-              type="success"
-              @click="addOrUpdateHandler()"
-              >{{ contents.btnAdAllFont == 1 ? '新增' : '' }}</el-button
-            >
-            <el-button
-              v-if="
-                isAuth('zuoyexinxi', '删除') &&
-                  contents.btnAdAllIcon == 1 &&
-                  contents.btnAdAllIconPosition == 1 &&
-                  contents.tableSelection
-              "
-              :disabled="dataListSelections.length <= 0"
-              type="danger"
-              icon="el-icon-delete"
-              @click="deleteHandler()"
-              >{{ contents.btnAdAllFont == 1 ? '删除' : '' }}</el-button
-            >
-            <el-button
-              v-if="
-                isAuth('zuoyexinxi', '删除') &&
-                  contents.btnAdAllIcon == 1 &&
-                  contents.btnAdAllIconPosition == 2 &&
-                  contents.tableSelection
-              "
+              style="margin-left: 20px;"
               :disabled="dataListSelections.length <= 0"
               type="danger"
               @click="deleteHandler()"
-              >{{ contents.btnAdAllFont == 1 ? '删除' : '' }}<i class="el-icon-delete el-icon--right"
-            /></el-button>
-            <el-button
-              v-if="isAuth('zuoyexinxi', '删除') && contents.btnAdAllIcon == 0 && contents.tableSelection"
-              :disabled="dataListSelections.length <= 0"
-              type="danger"
-              @click="deleteHandler()"
-              >{{ contents.btnAdAllFont == 1 ? '删除' : '' }}</el-button
+              >删除</el-button
             >
           </el-form-item>
         </el-row>
@@ -158,8 +65,8 @@
           :row-style="rowStyle"
           :cell-style="cellStyle"
           :style="{ width: '100%', fontSize: contents.tableContentFontSize, color: contents.tableContentFontColor }"
-          v-if="isAuth('zuoyexinxi', '查看')"
-          :data="dataList"
+          v-if="isAuth('zuoyedianping', '查看')"
+          :data="works"
           v-loading="dataListLoading"
           @selection-change="selectionChangeHandler"
         >
@@ -169,95 +76,65 @@
           <el-table-column
             :sortable="contents.tableSortable"
             :align="contents.tableAlign"
-            prop="zuoyebianhao"
+            prop="number"
             header-align="center"
-            label="作业编号"
+            label="题目编号"
           >
             <template slot-scope="scope">
-              {{ scope.row.zuoyebianhao }}
+              {{ scope.row.number }}
             </template>
           </el-table-column>
           <el-table-column
             :sortable="contents.tableSortable"
             :align="contents.tableAlign"
-            prop="zuoyebiaoti"
+            prop="name"
             header-align="center"
-            label="作业标题"
+            label="题目名称"
           >
             <template slot-scope="scope">
-              {{ scope.row.zuoyebiaoti }}
+              {{ scope.row.name }}
             </template>
           </el-table-column>
           <el-table-column
             :sortable="contents.tableSortable"
             :align="contents.tableAlign"
-            prop="zuoyewenjian"
+            prop="action"
             header-align="center"
-            label="作业文件"
+            label="上传人"
           >
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="download(scope.row.zuoyewenjian)">下载</el-button>
+              {{ scope.row.action }}
             </template>
           </el-table-column>
           <el-table-column
             :sortable="contents.tableSortable"
             :align="contents.tableAlign"
-            prop="zuoyeneirong"
+            prop="fileName"
             header-align="center"
-            label="作业内容"
+            label="文件"
+            style="color: blue; text-decoration: underline;"
           >
             <template slot-scope="scope">
-              {{ scope.row.zuoyeneirong }}
+              <span style="color: blue;text-decoration: underline;">
+                {{ scope.row.fileName }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column
             :sortable="contents.tableSortable"
             :align="contents.tableAlign"
-            prop="faburiqi"
+            prop="time"
             header-align="center"
-            label="发布日期"
+            label="上传时间"
           >
             <template slot-scope="scope">
-              {{ scope.row.faburiqi }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            :sortable="contents.tableSortable"
-            :align="contents.tableAlign"
-            prop="gonghao"
-            header-align="center"
-            label="工号"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.gonghao }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            :sortable="contents.tableSortable"
-            :align="contents.tableAlign"
-            prop="jiaoshixingming"
-            header-align="center"
-            label="教师姓名"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.jiaoshixingming }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            :sortable="contents.tableSortable"
-            :align="contents.tableAlign"
-            prop="banji"
-            header-align="center"
-            label="班级"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.banji }}
+              {{ scope.row.time }}
             </template>
           </el-table-column>
           <el-table-column width="300" :align="contents.tableAlign" header-align="center" label="操作">
             <template slot-scope="scope">
               <el-button
-                v-if="isAuth('zuoyexinxi', '查看') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 1"
+                v-if="isAuth('zuoyedianping', '查看') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 1"
                 type="success"
                 icon="el-icon-tickets"
                 size="mini"
@@ -265,43 +142,21 @@
                 >{{ contents.tableBtnFont == 1 ? '详情' : '' }}</el-button
               >
               <el-button
-                v-if="isAuth('zuoyexinxi', '查看') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 2"
+                v-if="isAuth('zuoyedianping', '查看') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 2"
                 type="success"
                 size="mini"
                 @click="addOrUpdateHandler(scope.row.id, 'info')"
                 >{{ contents.tableBtnFont == 1 ? '详情' : '' }}<i class="el-icon-tickets el-icon--right"
               /></el-button>
               <el-button
-                v-if="isAuth('zuoyexinxi', '查看') && contents.tableBtnIcon == 0"
+                v-if="isAuth('zuoyedianping', '查看') && contents.tableBtnIcon == 0"
                 type="success"
                 size="mini"
                 @click="addOrUpdateHandler(scope.row.id, 'info')"
                 >{{ contents.tableBtnFont == 1 ? '详情' : '' }}</el-button
               >
               <el-button
-                v-if="isAuth('zuoyexinxi', '提交作业') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 1"
-                type="success"
-                icon="el-icon-tickets"
-                size="mini"
-                @click="zuoyetijiaoCrossAddOrUpdateHandler(scope.row, 'cross')"
-                >{{ contents.tableBtnFont == 1 ? '提交作业' : '' }}</el-button
-              >
-              <el-button
-                v-if="isAuth('zuoyexinxi', '提交作业') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 2"
-                type="success"
-                size="mini"
-                @click="zuoyetijiaoCrossAddOrUpdateHandler(scope.row, 'cross')"
-                >{{ contents.tableBtnFont == 1 ? '提交作业' : '' }}<i class="el-icon-tickets el-icon--right"
-              /></el-button>
-              <el-button
-                v-if="isAuth('zuoyexinxi', '提交作业') && contents.tableBtnIcon == 0"
-                type="success"
-                size="mini"
-                @click="zuoyetijiaoCrossAddOrUpdateHandler(scope.row, 'cross')"
-                >{{ contents.tableBtnFont == 1 ? '提交作业' : '' }}</el-button
-              >
-              <el-button
-                v-if="isAuth('zuoyexinxi', '修改') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 1"
+                v-if="isAuth('zuoyedianping', '修改') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 1"
                 type="primary"
                 icon="el-icon-edit"
                 size="mini"
@@ -309,14 +164,14 @@
                 >{{ contents.tableBtnFont == 1 ? '修改' : '' }}</el-button
               >
               <el-button
-                v-if="isAuth('zuoyexinxi', '修改') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 2"
+                v-if="isAuth('zuoyedianping', '修改') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 2"
                 type="primary"
                 size="mini"
                 @click="addOrUpdateHandler(scope.row.id)"
                 >{{ contents.tableBtnFont == 1 ? '修改' : '' }}<i class="el-icon-edit el-icon--right"
               /></el-button>
               <el-button
-                v-if="isAuth('zuoyexinxi', '修改') && contents.tableBtnIcon == 0"
+                v-if="isAuth('zuoyedianping', '修改') && contents.tableBtnIcon == 0"
                 type="primary"
                 size="mini"
                 @click="addOrUpdateHandler(scope.row.id)"
@@ -324,7 +179,7 @@
               >
 
               <el-button
-                v-if="isAuth('zuoyexinxi', '删除') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 1"
+                v-if="isAuth('zuoyedianping', '删除') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 1"
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
@@ -332,14 +187,14 @@
                 >{{ contents.tableBtnFont == 1 ? '删除' : '' }}</el-button
               >
               <el-button
-                v-if="isAuth('zuoyexinxi', '删除') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 2"
+                v-if="isAuth('zuoyedianping', '删除') && contents.tableBtnIcon == 1 && contents.tableBtnIconPosition == 2"
                 type="danger"
                 size="mini"
                 @click="deleteHandler(scope.row.id)"
                 >{{ contents.tableBtnFont == 1 ? '删除' : '' }}<i class="el-icon-delete el-icon--right"
               /></el-button>
               <el-button
-                v-if="isAuth('zuoyexinxi', '删除') && contents.tableBtnIcon == 0"
+                v-if="isAuth('zuoyedianping', '删除') && contents.tableBtnIcon == 0"
                 type="danger"
                 size="mini"
                 @click="deleteHandler(scope.row.id)"
@@ -364,25 +219,66 @@
         ></el-pagination>
       </div>
     </div>
-    <!-- 添加/修改页面  将父组件的search方法传递给子组件-->
-    <add-or-update v-if="addOrUpdateFlag" :parent="this" ref="addOrUpdate"></add-or-update>
-
-    <zuoyetijiao-cross-add-or-update
-      v-if="zuoyetijiaoCrossAddOrUpdateFlag"
-      :parent="this"
-      ref="zuoyetijiaoCrossaddOrUpdate"
-    ></zuoyetijiao-cross-add-or-update>
+    <AddQuestion @clean="addQuestionClean" v-if="showAddQuestion"></AddQuestion>
   </div>
 </template>
 <script>
-import AddOrUpdate from './add-or-update'
-import zuoyetijiaoCrossAddOrUpdate from '../zuoyetijiao/add-or-update'
+import AddQuestion from './addQuestion.vue'
+import addQuestion from './addQuestion.vue'
 export default {
   data() {
     return {
+      showAddQuestion: false,
+      workType: [
+        {
+          id: undefined,
+          name: '全部',
+        },
+        {
+          id: 1,
+          name: '选择题',
+        },
+        {
+          id: 2,
+          name: '判断题',
+        },
+        {
+          id: 3,
+          name: '填空题',
+        },
+        {
+          id: 4,
+          name: '主观题',
+        },
+      ],
       searchForm: {
         key: '',
       },
+      works: Array.from({ length: 10 }, (_, i) => {
+        const names = [
+          '第一单元测试题01',
+          '第二单元测试题02',
+          '第三单元测试题03',
+          '第四单元测试题04',
+          '第五单元测试题05',
+          '第六单元测试题06',
+          '第七单元测试题07',
+          '第八单元测试题08',
+          '第九单元测试题09',
+          '第十单元测试题10',
+        ]
+        const actions = ['王明', '李华', '张伟', '赵强', '孙丽', '周杰', '吴敏', '郑爽', '钱坤', '冯涛']
+        const baseNumber = 100001
+        const baseDate = new Date(2025, 0, 1)
+        return {
+          id: i + 1,
+          number: baseNumber + i,
+          name: names[i],
+          fileName: `${names[i]}.doc`,
+          action: actions[i],
+          time: new Date(baseDate.getTime() + i * 86400000).toISOString().slice(0, 10),
+        }
+      }),
       form: {},
       dataList: [],
       pageIndex: 1,
@@ -395,7 +291,6 @@ export default {
       shForm: {},
       chartVisiable: false,
       addOrUpdateFlag: false,
-      zuoyetijiaoCrossAddOrUpdateFlag: false,
       contents: {
         searchBtnFontColor: '#333',
         pagePosition: '2',
@@ -494,11 +389,10 @@ export default {
       return val.replace(/<[^>]*>/g).replace(/undefined/g, '')
     },
   },
-  components: {
-    AddOrUpdate,
-    zuoyetijiaoCrossAddOrUpdate,
-  },
   methods: {
+    addQuestionClean() {
+      this.showAddQuestion = false
+    },
     contentStyleChange() {
       this.contentSearchStyleChange()
       this.contentBtnAdAllStyleChange()
@@ -673,16 +567,6 @@ export default {
       this.contents.pageEachNum = 10
     },
 
-    zuoyetijiaoCrossAddOrUpdateHandler(row, type) {
-      this.showFlag = false
-      this.addOrUpdateFlag = false
-      this.zuoyetijiaoCrossAddOrUpdateFlag = true
-      this.$storage.set('crossObj', row)
-      this.$storage.set('crossTable', 'zuoyexinxi')
-      this.$nextTick(() => {
-        this.$refs.zuoyetijiaoCrossaddOrUpdate.init(row.id, type)
-      })
-    },
     init() {},
     search() {
       this.pageIndex = 1
@@ -699,14 +583,11 @@ export default {
       if (this.searchForm.zuoyebiaoti != '' && this.searchForm.zuoyebiaoti != undefined) {
         params['zuoyebiaoti'] = '%' + this.searchForm.zuoyebiaoti + '%'
       }
-      if (this.searchForm.jiaoshixingming != '' && this.searchForm.jiaoshixingming != undefined) {
-        params['jiaoshixingming'] = '%' + this.searchForm.jiaoshixingming + '%'
-      }
-      if (this.searchForm.banji != '' && this.searchForm.banji != undefined) {
-        params['banji'] = '%' + this.searchForm.banji + '%'
+      if (this.searchForm.xueshengxingming != '' && this.searchForm.xueshengxingming != undefined) {
+        params['xueshengxingming'] = '%' + this.searchForm.xueshengxingming + '%'
       }
       this.$http({
-        url: 'zuoyexinxi/page',
+        url: 'zuoyedianping/page',
         method: 'get',
         params: params,
       }).then(({ data }) => {
@@ -735,18 +616,7 @@ export default {
     selectionChangeHandler(val) {
       this.dataListSelections = val
     },
-    // 添加/修改
-    addOrUpdateHandler(id, type) {
-      this.showFlag = false
-      this.addOrUpdateFlag = true
-      this.crossAddOrUpdateFlag = false
-      if (type != 'info') {
-        type = 'else'
-      }
-      this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id, type)
-      })
-    },
+
     // 查看评论
     // 下载
     download(file) {
@@ -765,7 +635,7 @@ export default {
         type: 'warning',
       }).then(() => {
         this.$http({
-          url: 'zuoyexinxi/delete',
+          url: 'zuoyedianping/delete',
           method: 'post',
           data: ids,
         }).then(({ data }) => {
@@ -784,6 +654,9 @@ export default {
         })
       })
     },
+  },
+  components: {
+    AddQuestion,
   },
 }
 </script>
